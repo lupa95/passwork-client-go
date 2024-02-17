@@ -22,3 +22,6 @@ go.work
 
 # VSCode
 launch.json
+
+# Scripts
+*.sh
