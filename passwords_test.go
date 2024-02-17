@@ -1,6 +1,7 @@
 package passwork
 
 import (
+	"log"
 	"os"
 	"testing"
 
@@ -18,7 +19,11 @@ var (
 
 func TestAddPassword(t *testing.T) {
 	c := NewClient(host, apiKey)
-	c.Login()
+	err := c.Login()
+	if err != nil {
+		log.Fatal("Could not login to Passwork!, Aborting test.")
+		return
+	}
 
 	request := PasswordRequest{
 		Name:            "provider-test-entry",
@@ -53,7 +58,11 @@ func TestAddPassword(t *testing.T) {
 
 func TestEditPassword(t *testing.T) {
 	c := NewClient(host, apiKey)
-	c.Login()
+	err := c.Login()
+	if err != nil {
+		log.Fatal("Could not login to Passwork!, Aborting test.")
+		return
+	}
 
 	request := PasswordRequest{
 		Name:            "provider-test-entry-changed",
@@ -89,7 +98,11 @@ func TestEditPassword(t *testing.T) {
 
 func TestSearchPassword(t *testing.T) {
 	c := NewClient(host, apiKey)
-	c.Login()
+	err := c.Login()
+	if err != nil {
+		log.Fatal("Could not login to Passwork!, Aborting test.")
+		return
+	}
 
 	request := PasswordSearchRequest{
 		Query:   pwName,
@@ -113,7 +126,11 @@ func TestSearchPassword(t *testing.T) {
 
 func TestGetPassword(t *testing.T) {
 	c := NewClient(host, apiKey)
-	c.Login()
+	err := c.Login()
+	if err != nil {
+		log.Fatal("Could not login to Passwork!, Aborting test.")
+		return
+	}
 
 	result, err := c.GetPassword(pwId)
 
@@ -133,7 +150,11 @@ func TestGetPassword(t *testing.T) {
 
 func TestDeletePassword(t *testing.T) {
 	c := NewClient(host, apiKey)
-	c.Login()
+	err := c.Login()
+	if err != nil {
+		log.Fatal("Could not login to Passwork!, Aborting test.")
+		return
+	}
 
 	result, err := c.DeletePassword(pwId)
 

@@ -73,9 +73,9 @@ func (c *Client) Login() error {
 
 	// Parse JSON into struct
 	var responseObject LoginResponse
-	error := json.Unmarshal(responseData, &responseObject)
-	if error != nil {
-		return error
+	err = json.Unmarshal(responseData, &responseObject)
+	if err != nil {
+		return err
 	}
 
 	c.sessionToken = responseObject.Data.Token
