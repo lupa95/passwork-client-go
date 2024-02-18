@@ -5,11 +5,6 @@ type PasswordResponse struct {
 	Data   PasswordResponseData
 }
 
-type PasswordDeleteResponse struct {
-	Status string
-	Data   string
-}
-
 type PasswordSearchResponse struct {
 	Status string
 	Data   []PasswordResponseData
@@ -29,7 +24,7 @@ type PasswordResponseData struct {
 	Color              int
 	Attachments        []PasswordAttachmentData
 	Tags               []string
-	Path               []PasswordPathData
+	Path               []PathData
 	Access             string
 	AccessCode         int
 	Shortcut           PasswordShortcutData
@@ -84,11 +79,4 @@ type PasswordShortcutData struct {
 	Access     string
 	AccessCode int
 	CryptedKey string
-}
-
-type PasswordPathData struct {
-	Order int
-	Name  string
-	Type  string // Allowed: vault, folder, inbox
-	Id    string
 }
