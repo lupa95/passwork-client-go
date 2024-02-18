@@ -1,4 +1,4 @@
-module example.com/passwork-client-go
+module github.com/lupa95
 
 go 1.21.5
 
