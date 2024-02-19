@@ -28,7 +28,7 @@ type FolderResponseData struct {
 	Access          int
 }
 
-type FolderAddRequest struct {
+type FolderRequest struct {
 	VaultId  string `json:"vaultId"`
 	Name     string `json:"name"`
 	ParentId string `json:"parentId,omitempty"`
