@@ -9,13 +9,14 @@ import (
 
 type PassworkTestSuite struct {
 	suite.Suite
-	ApiKey   string
-	Host     string
-	VaultId  string
-	FolderId string
-	PwId     string
-	PwName   string
-	client   *Client
+	ApiKey       string
+	Host         string
+	VaultId      string
+	FolderId     string
+	FolderName   string
+	PasswordId   string
+	PasswordName string
+	client       *Client
 }
 
 func (suite *PassworkTestSuite) SetupSuite() {
