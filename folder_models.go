@@ -21,7 +21,7 @@ type FolderResponseData struct {
 	Name            string
 	Id              string
 	ParentId        string
-	Path            PathData
+	Path            []PathData
 	FoldersAmount   int
 	PasswordsAmount int
 	ShortcutsAmount int
@@ -29,7 +29,7 @@ type FolderResponseData struct {
 }
 
 type FolderRequest struct {
-	VaultId  string `json:"vaultId"`
+	VaultId  string `json:"vaultId,omitempty"`
 	Name     string `json:"name"`
 	ParentId string `json:"parentId,omitempty"`
 }
