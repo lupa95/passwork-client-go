@@ -20,7 +20,7 @@ func (c *Client) GetFolder(folderId string) (FolderResponse, error) {
 	}
 
 	FolderResponseData, err := io.ReadAll(resp.Body)
-	if err != nil {
+	if resp.StatusCode != http.StatusOK || err != nil {
 		return responseObject, err
 	}
 
@@ -49,7 +49,7 @@ func (c *Client) SearchFolder(request FolderSearchRequest) (FolderSearchResponse
 
 	// HTTP request
 	resp, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if err != nil {
+	if resp.StatusCode != http.StatusOK || err != nil {
 		return responseObject, err
 	}
 
@@ -85,7 +85,7 @@ func (c *Client) AddFolder(folderRequest FolderRequest) (FolderResponse, error) 
 
 	// HTTP request
 	resp, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if err != nil {
+	if resp.StatusCode != http.StatusCreated || err != nil {
 		return responseObject, err
 	}
 
@@ -120,7 +120,7 @@ func (c *Client) EditFolder(folderId string, request FolderRequest) (FolderRespo
 
 	// HTTP request
 	resp, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if err != nil {
+	if resp.StatusCode != http.StatusOK || err != nil {
 		return responseObject, err
 	}
 
@@ -150,7 +150,7 @@ func (c *Client) DeleteFolder(folderId string) (DeleteResponse, error) {
 
 	// HTTP request
 	resp, err := c.sendRequest(method, url, nil)
-	if err != nil {
+	if resp.StatusCode != http.StatusOK || err != nil {
 		return responseObject, err
 	}
 
