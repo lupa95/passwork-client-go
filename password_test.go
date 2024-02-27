@@ -1,163 +1,104 @@
 package passwork
 
-import (
-	"log"
-	"os"
-	"testing"
+func (suite *PassworkTestSuite) TestPassword() {
+	suite.Run("Add", func() {
+		request := PasswordRequest{
+			Name:            "provider-test-entry",
+			VaultId:         suite.VaultId,
+			Login:           "provider-test-user",
+			CryptedPassword: "cHJvdmlkZXItdGVzdC1wYXNzd29yZA==",
+			Description:     "provider-test-description",
+			Url:             "https://login.com",
+			Color:           1,
+			Tags:            []string{"test", "foo", "bar"},
+		}
 
-	"github.com/stretchr/testify/assert"
-)
+		result, err := suite.client.AddPassword(request)
 
-var (
-	apiKey   string = os.Getenv("PASSWORK_API_KEY")
-	host     string = os.Getenv("PASSWORK_HOST")
-	vaultId  string = os.Getenv("PASSWORK_VAULT_ID")
-	folderId string = os.Getenv("PASSWORK_FOLDER_ID")
-	pwId     string
-	pwName   string
-)
+		if suite.NoError(err) {
+			suite.Equal(nil, err, "AddPassword() should not return an error.")
+			suite.Equal("success", result.Status, "AddPassword() should return success.")
+			suite.Equal("provider-test-entry", result.Data.Name, "Result name should be the same as request name.")
+			suite.Equal(suite.VaultId, result.Data.VaultId, "Result VaultId should be the same as request VaultId.")
+			suite.Equal("provider-test-user", result.Data.Login, "Result Login should be the same as request Login.")
+			suite.Equal("cHJvdmlkZXItdGVzdC1wYXNzd29yZA==", result.Data.CryptedPassword, "Result CryptedPassword should be the same as request CryptedPassword.")
+			suite.Equal("provider-test-description", result.Data.Description, "Result Description should be the same as request Description.")
+			suite.Equal("https://login.com", result.Data.Url, "Result Url should be the same as request Url.")
+			suite.Equal(1, result.Data.Color, "Result Color should be the same as request Color.")
+			suite.Equal(3, len(result.Data.Tags), "Number of result Tags should be the same as number of request Tags.")
+		}
+		suite.PasswordId = result.Data.Id
+	})
 
-func TestAddPassword(t *testing.T) {
-	c := NewClient(host, apiKey)
-	err := c.Login()
-	if err != nil {
-		log.Fatal("Could not login to Passwork!, Aborting test.")
-		return
-	}
+	suite.Run("Edit", func() {
+		request := PasswordRequest{
+			Name:            "provider-test-entry-changed",
+			VaultId:         suite.VaultId,
+			Login:           "provider-test-user-changed",
+			CryptedPassword: "cHJvdmlkZXItdGVzdC1wYXNzd29yZC1jaGFuZ2Vk",
+			Description:     "provider-test-description-changed",
+			Url:             "https://login-changed.com",
+			Color:           2,
+			Tags:            []string{"changed", "bar"},
+		}
 
-	request := PasswordRequest{
-		Name:            "provider-test-entry",
-		VaultId:         vaultId,
-		FolderId:        folderId,
-		Login:           "provider-test-user",
-		CryptedPassword: "cHJvdmlkZXItdGVzdC1wYXNzd29yZA==",
-		Description:     "provider-test-description",
-		Url:             "https://login.com",
-		Color:           1,
-		Tags:            []string{"test", "foo", "bar"},
-	}
+		result, err := suite.client.EditPassword(suite.PasswordId, request)
 
-	// Create password
-	result, err := c.AddPassword(request)
+		suite.Equal(nil, err, "EditPassword() should not return an error.")
+		suite.Equal(suite.PasswordId, result.Data.Id, "Result Password ID should be the same as previously created Password ID.")
+		suite.Equal("success", result.Status, "EditPassword() should return success.")
+		suite.Equal("provider-test-entry-changed", result.Data.Name, "Result name should be the same as request name.")
+		suite.Equal(suite.VaultId, result.Data.VaultId, "Result VaultId should be the same as request VaultId.")
+		suite.Equal("provider-test-user-changed", result.Data.Login, "Result Login should be the same as request Login.")
+		suite.Equal("cHJvdmlkZXItdGVzdC1wYXNzd29yZC1jaGFuZ2Vk", result.Data.CryptedPassword, "Result CryptedPassword should be the same as request CryptedPassword.")
+		suite.Equal("provider-test-description-changed", result.Data.Description, "Result Description should be the same as request Description.")
+		suite.Equal("https://login-changed.com", result.Data.Url, "Result Url should be the same as request Url.")
+		suite.Equal(2, result.Data.Color, "Result Color should be the same as request Color.")
+		suite.Equal(2, len(result.Data.Tags), "Number of result Tags should be the same as number of request Tags.")
 
-	assert.Equal(t, nil, err, "AddPassword() should not return an error.")
-	assert.Equal(t, "success", result.Status, "AddPassword() should return success.")
-	assert.Equal(t, "provider-test-entry", result.Data.Name, "Result name should be the same as request name.")
-	assert.Equal(t, vaultId, result.Data.VaultId, "Result VaultId should be the same as request VaultId.")
-	assert.Equal(t, folderId, result.Data.FolderId, "Result FolderId should be the same as request FolderId.")
-	assert.Equal(t, "provider-test-user", result.Data.Login, "Result Login should be the same as request Login.")
-	assert.Equal(t, "cHJvdmlkZXItdGVzdC1wYXNzd29yZA==", result.Data.CryptedPassword, "Result CryptedPassword should be the same as request CryptedPassword.")
-	assert.Equal(t, "provider-test-description", result.Data.Description, "Result Description should be the same as request Description.")
-	assert.Equal(t, "https://login.com", result.Data.Url, "Result Url should be the same as request Url.")
-	assert.Equal(t, 1, result.Data.Color, "Result Color should be the same as request Color.")
-	assert.Equal(t, 3, len(result.Data.Tags), "Number of result Tags should be the same as number of request Tags.")
+		suite.PasswordName = result.Data.Name
+	})
 
-	// Set pwId for subsequent test cases
-	pwId = result.Data.Id
-}
+	suite.Run("Search", func() {
+		request := PasswordSearchRequest{
+			Query:   suite.PasswordName,
+			VaultId: suite.VaultId,
+		}
 
-func TestEditPassword(t *testing.T) {
-	c := NewClient(host, apiKey)
-	err := c.Login()
-	if err != nil {
-		log.Fatal("Could not login to Passwork!, Aborting test.")
-		return
-	}
+		result, err := suite.client.SearchPassword(request)
 
-	request := PasswordRequest{
-		Name:            "provider-test-entry-changed",
-		VaultId:         vaultId,
-		FolderId:        folderId,
-		Login:           "provider-test-user-changed",
-		CryptedPassword: "cHJvdmlkZXItdGVzdC1wYXNzd29yZC1jaGFuZ2Vk",
-		Description:     "provider-test-description-changed",
-		Url:             "https://login-changed.com",
-		Color:           2,
-		Tags:            []string{"changed", "bar"},
-	}
+		suite.Equal(nil, err, "SearchPassword() should not return an error.")
+		suite.Equal("success", result.Status, "SearchPassword() should return success.")
+		suite.Equal("provider-test-entry-changed", result.Data[0].Name, "Result name should be the same as request name.")
+		suite.Equal(suite.VaultId, result.Data[0].VaultId, "Result VaultId should be the same as request VaultId.")
+		suite.Equal("provider-test-user-changed", result.Data[0].Login, "Result Login should be the same as request Login.")
+		suite.Equal(suite.PasswordId, result.Data[0].Id, "Result Password ID should be the same as previously created Password ID.")
+		suite.Equal("provider-test-description-changed", result.Data[0].Description, "Result Description should be the same as request Description.")
+		suite.Equal("https://login-changed.com", result.Data[0].Url, "Result Url should be the same as request Url.")
+		suite.Equal(2, result.Data[0].Color, "Result Color should be the same as request Color.")
+		suite.Equal(2, len(result.Data[0].Tags), "Number of result Tags should be the same as number of request Tags.")
+	})
 
-	// Edit password
-	result, err := c.EditPassword(pwId, request)
+	suite.Run("Get", func() {
+		result, err := suite.client.GetPassword(suite.PasswordId)
 
-	assert.Equal(t, nil, err, "EditPassword() should not return an error.")
-	assert.Equal(t, pwId, result.Data.Id, "Result Password ID should be the same as previously created Password ID.")
-	assert.Equal(t, "success", result.Status, "EditPassword() should return success.")
-	assert.Equal(t, "provider-test-entry-changed", result.Data.Name, "Result name should be the same as request name.")
-	assert.Equal(t, vaultId, result.Data.VaultId, "Result VaultId should be the same as request VaultId.")
-	assert.Equal(t, folderId, result.Data.FolderId, "Result FolderId should be the same as request FolderId.")
-	assert.Equal(t, "provider-test-user-changed", result.Data.Login, "Result Login should be the same as request Login.")
-	assert.Equal(t, "cHJvdmlkZXItdGVzdC1wYXNzd29yZC1jaGFuZ2Vk", result.Data.CryptedPassword, "Result CryptedPassword should be the same as request CryptedPassword.")
-	assert.Equal(t, "provider-test-description-changed", result.Data.Description, "Result Description should be the same as request Description.")
-	assert.Equal(t, "https://login-changed.com", result.Data.Url, "Result Url should be the same as request Url.")
-	assert.Equal(t, 2, result.Data.Color, "Result Color should be the same as request Color.")
-	assert.Equal(t, 2, len(result.Data.Tags), "Number of result Tags should be the same as number of request Tags.")
+		suite.Equal(nil, err, "GetPassword() should not return an error.")
+		suite.Equal(suite.PasswordId, result.Data.Id, "Result Password ID should be the same as previously created Password ID.")
+		suite.Equal("success", result.Status, "GetPassword() should return success.")
+		suite.Equal("provider-test-entry-changed", result.Data.Name, "Result name should be the same as request name.")
+		suite.Equal(suite.VaultId, result.Data.VaultId, "Result VaultId should be the same as request VaultId.")
+		suite.Equal("provider-test-user-changed", result.Data.Login, "Result Login should be the same as request Login.")
+		suite.Equal("cHJvdmlkZXItdGVzdC1wYXNzd29yZC1jaGFuZ2Vk", result.Data.CryptedPassword, "Result CryptedPassword should be the same as request CryptedPassword.")
+		suite.Equal("provider-test-description-changed", result.Data.Description, "Result Description should be the same as request Description.")
+		suite.Equal("https://login-changed.com", result.Data.Url, "Result Url should be the same as request Url.")
+		suite.Equal(2, result.Data.Color, "Result Color should be the same as request Color.")
+		suite.Equal(2, len(result.Data.Tags), "Number of result Tags should be the same as number of request Tags.")
+	})
 
-	// Set pwName for subsequent test cases
-	pwName = result.Data.Name
-}
+	suite.Run("Delete", func() {
+		result, err := suite.client.DeletePassword(suite.PasswordId)
 
-func TestSearchPassword(t *testing.T) {
-	c := NewClient(host, apiKey)
-	err := c.Login()
-	if err != nil {
-		log.Fatal("Could not login to Passwork!, Aborting test.")
-		return
-	}
-
-	request := PasswordSearchRequest{
-		Query:   pwName,
-		VaultId: vaultId,
-	}
-
-	result, err := c.SearchPassword(request)
-
-	assert.Equal(t, nil, err, "SearchPassword() should not return an error.")
-	assert.Equal(t, "success", result.Status, "SearchPassword() should return success.")
-	assert.Equal(t, "provider-test-entry-changed", result.Data[0].Name, "Result name should be the same as request name.")
-	assert.Equal(t, vaultId, result.Data[0].VaultId, "Result VaultId should be the same as request VaultId.")
-	assert.Equal(t, folderId, result.Data[0].FolderId, "Result FolderId should be the same as request FolderId.")
-	assert.Equal(t, "provider-test-user-changed", result.Data[0].Login, "Result Login should be the same as request Login.")
-	assert.Equal(t, pwId, result.Data[0].Id, "Result Password ID should be the same as previously created Password ID.")
-	assert.Equal(t, "provider-test-description-changed", result.Data[0].Description, "Result Description should be the same as request Description.")
-	assert.Equal(t, "https://login-changed.com", result.Data[0].Url, "Result Url should be the same as request Url.")
-	assert.Equal(t, 2, result.Data[0].Color, "Result Color should be the same as request Color.")
-	assert.Equal(t, 2, len(result.Data[0].Tags), "Number of result Tags should be the same as number of request Tags.")
-}
-
-func TestGetPassword(t *testing.T) {
-	c := NewClient(host, apiKey)
-	err := c.Login()
-	if err != nil {
-		log.Fatal("Could not login to Passwork!, Aborting test.")
-		return
-	}
-
-	result, err := c.GetPassword(pwId)
-
-	assert.Equal(t, nil, err, "GetPassword() should not return an error.")
-	assert.Equal(t, pwId, result.Data.Id, "Result Password ID should be the same as previously created Password ID.")
-	assert.Equal(t, "success", result.Status, "GetPassword() should return success.")
-	assert.Equal(t, "provider-test-entry-changed", result.Data.Name, "Result name should be the same as request name.")
-	assert.Equal(t, vaultId, result.Data.VaultId, "Result VaultId should be the same as request VaultId.")
-	assert.Equal(t, folderId, result.Data.FolderId, "Result FolderId should be the same as request FolderId.")
-	assert.Equal(t, "provider-test-user-changed", result.Data.Login, "Result Login should be the same as request Login.")
-	assert.Equal(t, "cHJvdmlkZXItdGVzdC1wYXNzd29yZC1jaGFuZ2Vk", result.Data.CryptedPassword, "Result CryptedPassword should be the same as request CryptedPassword.")
-	assert.Equal(t, "provider-test-description-changed", result.Data.Description, "Result Description should be the same as request Description.")
-	assert.Equal(t, "https://login-changed.com", result.Data.Url, "Result Url should be the same as request Url.")
-	assert.Equal(t, 2, result.Data.Color, "Result Color should be the same as request Color.")
-	assert.Equal(t, 2, len(result.Data.Tags), "Number of result Tags should be the same as number of request Tags.")
-}
-
-func TestDeletePassword(t *testing.T) {
-	c := NewClient(host, apiKey)
-	err := c.Login()
-	if err != nil {
-		log.Fatal("Could not login to Passwork!, Aborting test.")
-		return
-	}
-
-	result, err := c.DeletePassword(pwId)
-
-	assert.Equal(t, nil, err, "DeletePassword() should not return an error.")
-	assert.Equal(t, "success", result.Status, "DeletePassword() should return success.")
+		suite.Equal(nil, err, "DeletePassword() should not return an error.")
+		suite.Equal("success", result.Status, "DeletePassword() should return success.")
+	})
 }
