@@ -95,7 +95,7 @@ func (c *Client) AddFolder(folderRequest FolderRequest) (FolderResponse, error) 
 		return responseObject, err
 	}
 
-	// Parse JSON into struct (this returns a list of results)
+	// Parse JSON into struct
 	err = json.Unmarshal(responseData, &responseObject)
 	if err != nil {
 		return responseObject, err
