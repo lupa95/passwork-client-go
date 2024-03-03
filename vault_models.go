@@ -26,13 +26,8 @@ type VaultEditRequest struct {
 	Name string `json:"name"`
 }
 
-type VaultEditResponse struct {
+type VaultOperationResponse struct {
 	Status string // success
 	Code   string // always vaultUpdated
 	Data   string // Id of the Vault
-}
-
-type VaultDeleteResponse struct {
-	Status string // success
-	Data   string // Vault <VaultId> deleted
 }
