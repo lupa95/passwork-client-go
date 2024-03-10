@@ -12,6 +12,7 @@ type PassworkTestSuite struct {
 	ApiKey       string
 	Host         string
 	VaultId      string
+	VaultName    string
 	FolderId     string
 	FolderName   string
 	PasswordId   string
