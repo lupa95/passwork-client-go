@@ -84,7 +84,7 @@ func (c *Client) EditVault(vaultId string, request VaultEditRequest) (VaultOpera
 
 	// HTTP request
 	resp, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if resp.StatusCode != http.StatusOK || err != nil {
+	if resp.StatusCode != http.StatusCreated || err != nil {
 		return responseObject, err
 	}
 
