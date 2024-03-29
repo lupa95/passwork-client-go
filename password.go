@@ -3,6 +3,7 @@ package passwork
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -34,7 +35,7 @@ func (c *Client) GetPassword(pwId string) (PasswordResponse, error) {
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil
@@ -71,7 +72,7 @@ func (c *Client) SearchPassword(request PasswordSearchRequest) (PasswordSearchRe
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil
@@ -107,7 +108,7 @@ func (c *Client) AddPassword(pwRequest PasswordRequest) (PasswordResponse, error
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil
@@ -142,7 +143,7 @@ func (c *Client) EditPassword(pwId string, request PasswordRequest) (PasswordRes
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil
@@ -172,7 +173,7 @@ func (c *Client) DeletePassword(pwId string) (DeleteResponse, error) {
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil

@@ -3,6 +3,7 @@ package passwork
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -30,7 +31,7 @@ func (c *Client) GetFolder(folderId string) (FolderResponse, error) {
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil
@@ -66,7 +67,7 @@ func (c *Client) SearchFolder(request FolderSearchRequest) (FolderSearchResponse
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil
@@ -102,7 +103,7 @@ func (c *Client) AddFolder(folderRequest FolderRequest) (FolderResponse, error) 
 	}
 
 	if responseObject.Status != "success" && responseObject.Code != "folderCreated" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil
@@ -137,7 +138,7 @@ func (c *Client) EditFolder(folderId string, request FolderRequest) (FolderRespo
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil
@@ -167,7 +168,7 @@ func (c *Client) DeleteFolder(folderId string) (DeleteResponse, error) {
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil

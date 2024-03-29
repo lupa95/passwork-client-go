@@ -3,6 +3,7 @@ package passwork
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -30,7 +31,7 @@ func (c *Client) GetVault(vaultId string) (VaultResponse, error) {
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil
@@ -66,7 +67,7 @@ func (c *Client) AddVault(vaultRequest VaultAddRequest) (VaultOperationResponse,
 	}
 
 	if responseObject.Status != "success" && responseObject.Code != "vaultCreated" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil
@@ -101,7 +102,7 @@ func (c *Client) EditVault(vaultId string, request VaultEditRequest) (VaultOpera
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil
@@ -131,7 +132,7 @@ func (c *Client) DeleteVault(vaultId string) (DeleteResponse, error) {
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, err
+		return responseObject, errors.New(responseObject.Status)
 	}
 
 	return responseObject, nil
