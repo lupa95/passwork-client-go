@@ -11,6 +11,7 @@ type VaultResponseData struct {
 	VaultPasswordCrypted string
 	Access               string
 	Scope                string
+	Visible              bool // only present in response when IsPrivate = true
 }
 
 type VaultAddRequest struct {
