@@ -20,6 +20,11 @@ type LoginResponse struct {
 	Data   LoginResponseData
 }
 
+type LogoutResponse struct {
+	Status string
+	Data   string
+}
+
 type LoginResponseData struct {
 	Token                 string
 	RefreshToken          string
@@ -51,25 +56,16 @@ func NewClient(baseURL, apiKey string, timeout time.Duration) *Client {
 func (c *Client) Login() error {
 	url := fmt.Sprintf("%s/auth/login/%s", c.BaseURL, c.apiKey)
 
-	req, err := http.NewRequest("POST", url, nil)
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Accept", "application/json")
-
-	// Do HTTP Request
-	res, err := c.HTTPClient.Do(req)
-	if err != nil {
+	resp, err := c.sendRequest(http.MethodPost, url, nil)
+	if resp.StatusCode != http.StatusOK || err != nil {
 		return err
 	}
 
 	// Convert Body into byte stream
-	responseData, err := io.ReadAll(res.Body)
+	responseData, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
-
-	defer res.Body.Close()
 
 	// Parse JSON into struct
 	var responseObject LoginResponse
@@ -78,8 +74,40 @@ func (c *Client) Login() error {
 		return err
 	}
 
-	c.sessionToken = responseObject.Data.Token
-	return nil
+	if responseObject.Status == "success" {
+		c.sessionToken = responseObject.Data.Token
+		return nil
+	}
+
+	return err
+}
+
+func (c *Client) Logout() error {
+	url := fmt.Sprintf("%s/auth/logout", c.BaseURL)
+
+	resp, err := c.sendRequest(http.MethodPost, url, nil)
+	if resp.StatusCode != http.StatusOK || err != nil {
+		return err
+	}
+
+	// Convert Body into byte stream
+	responseData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	// Parse JSON into struct
+	var responseObject LogoutResponse
+	err = json.Unmarshal(responseData, &responseObject)
+	if err != nil {
+		return err
+	}
+
+	if responseObject.Status == "success" && responseObject.Data == "loggedOut" {
+		return nil
+	}
+
+	return err
 }
 
 // Sends HTTP request to URL with method and body
@@ -100,6 +128,7 @@ func (c *Client) sendRequest(method string, url string, body io.Reader) (*http.R
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	return resp, nil
 }
