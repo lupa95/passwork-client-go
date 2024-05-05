@@ -35,13 +35,13 @@ type User struct {
 	Email string
 }
 
-func NewClient(baseURL, apiKey string) *Client {
+func NewClient(baseURL, apiKey string, timeout time.Duration) *Client {
 	client := Client{
 		BaseURL:      baseURL,
 		apiKey:       apiKey,
 		sessionToken: "",
 		HTTPClient: &http.Client{
-			Timeout: time.Minute,
+			Timeout: timeout,
 		},
 	}
 	return &client
