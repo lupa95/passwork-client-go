@@ -16,7 +16,7 @@ func (c *Client) GetVault(vaultId string) (VaultResponse, error) {
 	var err error
 
 	resp, err := c.sendRequest(method, url, nil)
-	if err != nil {
+	if resp.StatusCode != http.StatusOK || err != nil {
 		return responseObject, err
 	}
 

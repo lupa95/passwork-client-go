@@ -16,12 +16,12 @@ func (c *Client) GetFolder(folderId string) (FolderResponse, error) {
 	var err error
 
 	resp, err := c.sendRequest(method, url, nil)
-	if err != nil {
+	if resp.StatusCode != http.StatusOK || err != nil {
 		return responseObject, err
 	}
 
 	FolderResponseData, err := io.ReadAll(resp.Body)
-	if resp.StatusCode != http.StatusOK || err != nil {
+	if err != nil {
 		return responseObject, err
 	}
 
