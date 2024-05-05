@@ -66,6 +66,7 @@ func (c *Client) Login() error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	var responseObject LoginResponse
@@ -95,6 +96,7 @@ func (c *Client) Logout() error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	var responseObject LogoutResponse
@@ -128,7 +130,6 @@ func (c *Client) sendRequest(method string, url string, body io.Reader) (*http.R
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 
 	return resp, nil
 }

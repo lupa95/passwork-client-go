@@ -24,6 +24,7 @@ func (c *Client) GetVault(vaultId string) (VaultResponse, error) {
 	if resp.StatusCode != http.StatusOK || err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	err = json.Unmarshal(FolderResponseData, &responseObject)
 	if err != nil {
@@ -59,6 +60,7 @@ func (c *Client) AddVault(vaultRequest VaultAddRequest) (VaultOperationResponse,
 	if err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	err = json.Unmarshal(responseData, &responseObject)
@@ -94,6 +96,7 @@ func (c *Client) EditVault(vaultId string, request VaultEditRequest) (VaultOpera
 	if err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	err = json.Unmarshal(responseData, &responseObject)
@@ -124,6 +127,7 @@ func (c *Client) DeleteVault(vaultId string) (DeleteResponse, error) {
 	if err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	err = json.Unmarshal(responseData, &responseObject)

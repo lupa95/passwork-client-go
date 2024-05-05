@@ -24,6 +24,7 @@ func (c *Client) GetFolder(folderId string) (FolderResponse, error) {
 	if err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	err = json.Unmarshal(FolderResponseData, &responseObject)
 	if err != nil {
@@ -59,6 +60,7 @@ func (c *Client) SearchFolder(request FolderSearchRequest) (FolderSearchResponse
 	if err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct (this returns a list of results)
 	err = json.Unmarshal(responseData, &responseObject)
@@ -95,6 +97,7 @@ func (c *Client) AddFolder(folderRequest FolderRequest) (FolderResponse, error) 
 	if err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	err = json.Unmarshal(responseData, &responseObject)
@@ -130,6 +133,7 @@ func (c *Client) EditFolder(folderId string, request FolderRequest) (FolderRespo
 	if err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	err = json.Unmarshal(responseData, &responseObject)
@@ -160,6 +164,7 @@ func (c *Client) DeleteFolder(folderId string) (DeleteResponse, error) {
 	if err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	err = json.Unmarshal(responseData, &responseObject)

@@ -27,6 +27,7 @@ func (c *Client) GetPassword(pwId string) (PasswordResponse, error) {
 	if err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	err = json.Unmarshal(PasswordResponseData, &responseObject)
@@ -64,6 +65,7 @@ func (c *Client) SearchPassword(request PasswordSearchRequest) (PasswordSearchRe
 	if err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct (this returns a list of results)
 	err = json.Unmarshal(responseData, &responseObject)
@@ -100,6 +102,7 @@ func (c *Client) AddPassword(pwRequest PasswordRequest) (PasswordResponse, error
 	if err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	err = json.Unmarshal(responseData, &responseObject)
@@ -135,6 +138,7 @@ func (c *Client) EditPassword(pwId string, request PasswordRequest) (PasswordRes
 	if err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	err = json.Unmarshal(responseData, &responseObject)
@@ -165,6 +169,7 @@ func (c *Client) DeletePassword(pwId string) (DeleteResponse, error) {
 	if err != nil {
 		return responseObject, err
 	}
+	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	err = json.Unmarshal(responseData, &responseObject)
