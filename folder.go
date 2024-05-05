@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 )
 
@@ -15,18 +14,12 @@ func (c *Client) GetFolder(folderId string) (FolderResponse, error) {
 	var responseObject FolderResponse
 	var err error
 
-	resp, err := c.sendRequest(method, url, nil)
-	if resp.StatusCode != http.StatusOK || err != nil {
+	response, responseCode, err := c.sendRequest(method, url, nil)
+	if responseCode != http.StatusOK || err != nil {
 		return responseObject, err
 	}
 
-	FolderResponseData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return responseObject, err
-	}
-	defer resp.Body.Close()
-
-	err = json.Unmarshal(FolderResponseData, &responseObject)
+	err = json.Unmarshal(response, &responseObject)
 	if err != nil {
 		return responseObject, err
 	}
@@ -50,20 +43,13 @@ func (c *Client) SearchFolder(request FolderSearchRequest) (FolderSearchResponse
 	}
 
 	// HTTP request
-	resp, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if resp.StatusCode != http.StatusOK || err != nil {
+	response, responseCode, err := c.sendRequest(method, url, bytes.NewReader(body))
+	if responseCode != http.StatusOK || err != nil {
 		return responseObject, err
 	}
-
-	// Convert Body into byte stream
-	responseData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return responseObject, err
-	}
-	defer resp.Body.Close()
 
 	// Parse JSON into struct (this returns a list of results)
-	err = json.Unmarshal(responseData, &responseObject)
+	err = json.Unmarshal(response, &responseObject)
 	if err != nil {
 		return responseObject, err
 	}
@@ -87,20 +73,13 @@ func (c *Client) AddFolder(folderRequest FolderRequest) (FolderResponse, error) 
 	}
 
 	// HTTP request
-	resp, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if resp.StatusCode != http.StatusCreated || err != nil {
+	response, responseCode, err := c.sendRequest(method, url, bytes.NewReader(body))
+	if responseCode != http.StatusCreated || err != nil {
 		return responseObject, err
 	}
-
-	// Convert Body into byte stream
-	responseData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return responseObject, err
-	}
-	defer resp.Body.Close()
 
 	// Parse JSON into struct
-	err = json.Unmarshal(responseData, &responseObject)
+	err = json.Unmarshal(response, &responseObject)
 	if err != nil {
 		return responseObject, err
 	}
@@ -123,20 +102,13 @@ func (c *Client) EditFolder(folderId string, request FolderRequest) (FolderRespo
 	}
 
 	// HTTP request
-	resp, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if resp.StatusCode != http.StatusOK || err != nil {
+	response, responseCode, err := c.sendRequest(method, url, bytes.NewReader(body))
+	if responseCode != http.StatusOK || err != nil {
 		return responseObject, err
 	}
-
-	// Convert Body into byte stream
-	responseData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return responseObject, err
-	}
-	defer resp.Body.Close()
 
 	// Parse JSON into struct
-	err = json.Unmarshal(responseData, &responseObject)
+	err = json.Unmarshal(response, &responseObject)
 	if err != nil {
 		return responseObject, err
 	}
@@ -154,20 +126,13 @@ func (c *Client) DeleteFolder(folderId string) (DeleteResponse, error) {
 	var responseObject DeleteResponse
 
 	// HTTP request
-	resp, err := c.sendRequest(method, url, nil)
-	if resp.StatusCode != http.StatusOK || err != nil {
+	response, responseCode, err := c.sendRequest(method, url, nil)
+	if responseCode != http.StatusOK || err != nil {
 		return responseObject, err
 	}
-
-	// Convert Body into byte stream
-	responseData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return responseObject, err
-	}
-	defer resp.Body.Close()
 
 	// Parse JSON into struct
-	err = json.Unmarshal(responseData, &responseObject)
+	err = json.Unmarshal(response, &responseObject)
 	if err != nil {
 		return responseObject, err
 	}

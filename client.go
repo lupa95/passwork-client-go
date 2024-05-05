@@ -56,21 +56,14 @@ func NewClient(baseURL, apiKey string, timeout time.Duration) *Client {
 func (c *Client) Login() error {
 	url := fmt.Sprintf("%s/auth/login/%s", c.BaseURL, c.apiKey)
 
-	resp, err := c.sendRequest(http.MethodPost, url, nil)
-	if resp.StatusCode != http.StatusOK || err != nil {
+	response, responseCode, err := c.sendRequest(http.MethodPost, url, nil)
+	if responseCode != http.StatusOK || err != nil {
 		return err
 	}
-
-	// Convert Body into byte stream
-	responseData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	var responseObject LoginResponse
-	err = json.Unmarshal(responseData, &responseObject)
+	err = json.Unmarshal(response, &responseObject)
 	if err != nil {
 		return err
 	}
@@ -86,17 +79,10 @@ func (c *Client) Login() error {
 func (c *Client) Logout() error {
 	url := fmt.Sprintf("%s/auth/logout", c.BaseURL)
 
-	resp, err := c.sendRequest(http.MethodPost, url, nil)
-	if resp.StatusCode != http.StatusOK || err != nil {
+	responseData, responseCode, err := c.sendRequest(http.MethodPost, url, nil)
+	if responseCode != http.StatusOK || err != nil {
 		return err
 	}
-
-	// Convert Body into byte stream
-	responseData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
 
 	// Parse JSON into struct
 	var responseObject LogoutResponse
@@ -114,11 +100,11 @@ func (c *Client) Logout() error {
 
 // Sends HTTP request to URL with method and body
 // Returns answer body
-func (c *Client) sendRequest(method string, url string, body io.Reader) (*http.Response, error) {
+func (c *Client) sendRequest(method string, url string, body io.Reader) ([]byte, int, error) {
 
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -128,8 +114,15 @@ func (c *Client) sendRequest(method string, url string, body io.Reader) (*http.R
 	// Do HTTP Request
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, resp.StatusCode, err
 	}
 
-	return resp, nil
+	// Convert Body into byte stream
+	responseData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return responseData, resp.StatusCode, err
+	}
+	defer resp.Body.Close()
+
+	return responseData, resp.StatusCode, nil
 }

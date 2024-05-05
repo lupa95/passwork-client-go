@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 )
 
@@ -15,18 +14,12 @@ func (c *Client) GetVault(vaultId string) (VaultResponse, error) {
 	var responseObject VaultResponse
 	var err error
 
-	resp, err := c.sendRequest(method, url, nil)
-	if resp.StatusCode != http.StatusOK || err != nil {
+	response, responseCode, err := c.sendRequest(method, url, nil)
+	if responseCode != http.StatusOK || err != nil {
 		return responseObject, err
 	}
 
-	FolderResponseData, err := io.ReadAll(resp.Body)
-	if resp.StatusCode != http.StatusOK || err != nil {
-		return responseObject, err
-	}
-	defer resp.Body.Close()
-
-	err = json.Unmarshal(FolderResponseData, &responseObject)
+	err = json.Unmarshal(response, &responseObject)
 	if err != nil {
 		return responseObject, err
 	}
@@ -50,20 +43,13 @@ func (c *Client) AddVault(vaultRequest VaultAddRequest) (VaultOperationResponse,
 	}
 
 	// HTTP request
-	resp, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if resp.StatusCode != http.StatusCreated || err != nil {
+	response, responseCode, err := c.sendRequest(method, url, bytes.NewReader(body))
+	if responseCode != http.StatusCreated || err != nil {
 		return responseObject, err
 	}
-
-	// Convert Body into byte stream
-	responseData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return responseObject, err
-	}
-	defer resp.Body.Close()
 
 	// Parse JSON into struct
-	err = json.Unmarshal(responseData, &responseObject)
+	err = json.Unmarshal(response, &responseObject)
 	if err != nil {
 		return responseObject, err
 	}
@@ -86,20 +72,13 @@ func (c *Client) EditVault(vaultId string, request VaultEditRequest) (VaultOpera
 	}
 
 	// HTTP request
-	resp, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if resp.StatusCode != http.StatusCreated || err != nil {
+	response, responseCode, err := c.sendRequest(method, url, bytes.NewReader(body))
+	if responseCode != http.StatusCreated || err != nil {
 		return responseObject, err
 	}
-
-	// Convert Body into byte stream
-	responseData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return responseObject, err
-	}
-	defer resp.Body.Close()
 
 	// Parse JSON into struct
-	err = json.Unmarshal(responseData, &responseObject)
+	err = json.Unmarshal(response, &responseObject)
 	if err != nil {
 		return responseObject, err
 	}
@@ -117,20 +96,13 @@ func (c *Client) DeleteVault(vaultId string) (DeleteResponse, error) {
 	var responseObject DeleteResponse
 
 	// HTTP request
-	resp, err := c.sendRequest(method, url, nil)
-	if resp.StatusCode != http.StatusOK || err != nil {
+	response, responseCode, err := c.sendRequest(method, url, nil)
+	if responseCode != http.StatusOK || err != nil {
 		return responseObject, err
 	}
-
-	// Convert Body into byte stream
-	responseData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return responseObject, err
-	}
-	defer resp.Body.Close()
 
 	// Parse JSON into struct
-	err = json.Unmarshal(responseData, &responseObject)
+	err = json.Unmarshal(response, &responseObject)
 	if err != nil {
 		return responseObject, err
 	}
