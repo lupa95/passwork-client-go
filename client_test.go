@@ -29,7 +29,7 @@ func (suite *PassworkTestSuite) SetupSuite() {
 	suite.client = NewClient(suite.Host, suite.ApiKey, time.Second*30)
 	err := suite.client.Login()
 	if err != nil {
-		suite.Fail("Could not login to Passwork!, Aborting test suite.")
+		suite.Fail("Could not login to Passwork, Aborting test suite.")
 	}
 }
 
