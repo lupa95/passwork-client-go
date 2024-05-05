@@ -20,6 +20,11 @@ type LoginResponse struct {
 	Data   LoginResponseData
 }
 
+type LogoutResponse struct {
+	Status string
+	Data   string
+}
+
 type LoginResponseData struct {
 	Token                 string
 	RefreshToken          string
@@ -35,13 +40,13 @@ type User struct {
 	Email string
 }
 
-func NewClient(baseURL, apiKey string) *Client {
+func NewClient(baseURL, apiKey string, timeout time.Duration) *Client {
 	client := Client{
 		BaseURL:      baseURL,
 		apiKey:       apiKey,
 		sessionToken: "",
 		HTTPClient: &http.Client{
-			Timeout: time.Minute,
+			Timeout: timeout,
 		},
 	}
 	return &client
@@ -51,44 +56,55 @@ func NewClient(baseURL, apiKey string) *Client {
 func (c *Client) Login() error {
 	url := fmt.Sprintf("%s/auth/login/%s", c.BaseURL, c.apiKey)
 
-	req, err := http.NewRequest("POST", url, nil)
-	if err != nil {
+	response, responseCode, err := c.sendRequest(http.MethodPost, url, nil)
+	if responseCode != http.StatusOK || err != nil {
 		return err
 	}
-	req.Header.Set("Accept", "application/json")
-
-	// Do HTTP Request
-	res, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return err
-	}
-
-	// Convert Body into byte stream
-	responseData, err := io.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
-
-	defer res.Body.Close()
 
 	// Parse JSON into struct
 	var responseObject LoginResponse
+	err = json.Unmarshal(response, &responseObject)
+	if err != nil {
+		return err
+	}
+
+	if responseObject.Status == "success" {
+		c.sessionToken = responseObject.Data.Token
+		return nil
+	}
+
+	return err
+}
+
+func (c *Client) Logout() error {
+	url := fmt.Sprintf("%s/auth/logout", c.BaseURL)
+
+	responseData, responseCode, err := c.sendRequest(http.MethodPost, url, nil)
+	if responseCode != http.StatusOK || err != nil {
+		return err
+	}
+
+	// Parse JSON into struct
+	var responseObject LogoutResponse
 	err = json.Unmarshal(responseData, &responseObject)
 	if err != nil {
 		return err
 	}
 
-	c.sessionToken = responseObject.Data.Token
-	return nil
+	if responseObject.Status == "success" && responseObject.Data == "loggedOut" {
+		return nil
+	}
+
+	return err
 }
 
 // Sends HTTP request to URL with method and body
 // Returns answer body
-func (c *Client) sendRequest(method string, url string, body io.Reader) (*http.Response, error) {
+func (c *Client) sendRequest(method string, url string, body io.Reader) ([]byte, int, error) {
 
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -98,8 +114,15 @@ func (c *Client) sendRequest(method string, url string, body io.Reader) (*http.R
 	// Do HTTP Request
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, resp.StatusCode, err
 	}
 
-	return resp, nil
+	// Convert Body into byte stream
+	responseData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return responseData, resp.StatusCode, err
+	}
+	defer resp.Body.Close()
+
+	return responseData, resp.StatusCode, nil
 }

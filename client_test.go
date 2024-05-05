@@ -3,6 +3,7 @@ package passwork
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -25,10 +26,10 @@ func (suite *PassworkTestSuite) SetupSuite() {
 	suite.Host = os.Getenv("PASSWORK_HOST")
 	suite.VaultId = os.Getenv("PASSWORK_VAULT_ID")
 
-	suite.client = NewClient(suite.Host, suite.ApiKey)
+	suite.client = NewClient(suite.Host, suite.ApiKey, time.Second*30)
 	err := suite.client.Login()
 	if err != nil {
-		suite.Fail("Could not login to Passwork!, Aborting test suite.")
+		suite.Fail("Could not login to Passwork, Aborting test suite.")
 	}
 }
 
