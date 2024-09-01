@@ -16,8 +16,8 @@ func (c *Client) GetPassword(pwId string) (PasswordResponse, error) {
 	var err error
 
 	// HTTP request
-	response, responseCode, err := c.sendRequest(method, url, nil)
-	if responseCode != http.StatusOK || err != nil {
+	response, _, err := c.sendRequest(method, url, nil)
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -28,7 +28,7 @@ func (c *Client) GetPassword(pwId string) (PasswordResponse, error) {
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil
@@ -47,8 +47,8 @@ func (c *Client) SearchPassword(request PasswordSearchRequest) (PasswordSearchRe
 	}
 
 	// HTTP request
-	response, responseCode, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if responseCode != http.StatusOK || err != nil {
+	response, _, err := c.sendRequest(method, url, bytes.NewReader(body))
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -59,7 +59,7 @@ func (c *Client) SearchPassword(request PasswordSearchRequest) (PasswordSearchRe
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil
@@ -77,8 +77,8 @@ func (c *Client) AddPassword(pwRequest PasswordRequest) (PasswordResponse, error
 	}
 
 	// HTTP request
-	response, responseCode, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if responseCode != http.StatusOK || err != nil {
+	response, _, err := c.sendRequest(method, url, bytes.NewReader(body))
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -89,7 +89,7 @@ func (c *Client) AddPassword(pwRequest PasswordRequest) (PasswordResponse, error
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil
@@ -106,8 +106,8 @@ func (c *Client) EditPassword(pwId string, request PasswordRequest) (PasswordRes
 	}
 
 	// HTTP request
-	response, responseCode, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if responseCode != http.StatusOK || err != nil {
+	response, _, err := c.sendRequest(method, url, bytes.NewReader(body))
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -118,7 +118,7 @@ func (c *Client) EditPassword(pwId string, request PasswordRequest) (PasswordRes
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil
@@ -130,8 +130,8 @@ func (c *Client) DeletePassword(pwId string) (DeleteResponse, error) {
 	var responseObject DeleteResponse
 
 	// HTTP request
-	response, responseCode, err := c.sendRequest(method, url, nil)
-	if responseCode != http.StatusOK || err != nil {
+	response, _, err := c.sendRequest(method, url, nil)
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -142,7 +142,7 @@ func (c *Client) DeletePassword(pwId string) (DeleteResponse, error) {
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil

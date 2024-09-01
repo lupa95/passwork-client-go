@@ -2,11 +2,13 @@ package passwork
 
 type PasswordResponse struct {
 	Status string
+	Code   string // passwordNull, accessDenied
 	Data   PasswordResponseData
 }
 
 type PasswordSearchResponse struct {
 	Status string
+	Code   string
 	Data   []PasswordResponseData
 }
 

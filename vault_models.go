@@ -2,6 +2,7 @@ package passwork
 
 type VaultResponse struct {
 	Status string
+	Code   string
 	Data   VaultResponseData
 }
 

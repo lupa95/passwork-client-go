@@ -2,17 +2,19 @@ package passwork
 
 type FolderResponse struct {
 	Status string
-	Data   FolderResponseData
 	Code   string // folderCreated, folderRenamed
+	Data   FolderResponseData
 }
 
 type FolderSearchResponse struct {
 	Status string
+	Code   string
 	Data   []FolderResponseData
 }
 
 type FolderDeleteResponse struct {
 	Status string
+	Code   string
 	Data   string // folderDeleted
 }
 
