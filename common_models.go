@@ -9,5 +9,6 @@ type PathData struct {
 
 type DeleteResponse struct {
 	Status string
+	Code   string
 	Data   string
 }

@@ -14,8 +14,8 @@ func (c *Client) GetVault(vaultId string) (VaultResponse, error) {
 	var responseObject VaultResponse
 	var err error
 
-	response, responseCode, err := c.sendRequest(method, url, nil)
-	if responseCode != http.StatusOK || err != nil {
+	response, _, err := c.sendRequest(method, url, nil)
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -25,7 +25,7 @@ func (c *Client) GetVault(vaultId string) (VaultResponse, error) {
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil
@@ -43,8 +43,8 @@ func (c *Client) AddVault(vaultRequest VaultAddRequest) (VaultOperationResponse,
 	}
 
 	// HTTP request
-	response, responseCode, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if responseCode != http.StatusCreated || err != nil {
+	response, _, err := c.sendRequest(method, url, bytes.NewReader(body))
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -55,7 +55,7 @@ func (c *Client) AddVault(vaultRequest VaultAddRequest) (VaultOperationResponse,
 	}
 
 	if responseObject.Status != "success" && responseObject.Code != "vaultCreated" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil
@@ -72,8 +72,8 @@ func (c *Client) EditVault(vaultId string, request VaultEditRequest) (VaultOpera
 	}
 
 	// HTTP request
-	response, responseCode, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if responseCode != http.StatusCreated || err != nil {
+	response, _, err := c.sendRequest(method, url, bytes.NewReader(body))
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -84,7 +84,7 @@ func (c *Client) EditVault(vaultId string, request VaultEditRequest) (VaultOpera
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil
@@ -96,8 +96,8 @@ func (c *Client) DeleteVault(vaultId string) (DeleteResponse, error) {
 	var responseObject DeleteResponse
 
 	// HTTP request
-	response, responseCode, err := c.sendRequest(method, url, nil)
-	if responseCode != http.StatusOK || err != nil {
+	response, _, err := c.sendRequest(method, url, nil)
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -108,7 +108,7 @@ func (c *Client) DeleteVault(vaultId string) (DeleteResponse, error) {
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil

@@ -56,8 +56,8 @@ func NewClient(baseURL, apiKey string, timeout time.Duration) *Client {
 func (c *Client) Login() error {
 	url := fmt.Sprintf("%s/auth/login/%s", c.BaseURL, c.apiKey)
 
-	response, responseCode, err := c.sendRequest(http.MethodPost, url, nil)
-	if responseCode != http.StatusOK || err != nil {
+	response, _, err := c.sendRequest(http.MethodPost, url, nil)
+	if err != nil {
 		return err
 	}
 
@@ -79,8 +79,8 @@ func (c *Client) Login() error {
 func (c *Client) Logout() error {
 	url := fmt.Sprintf("%s/auth/logout", c.BaseURL)
 
-	responseData, responseCode, err := c.sendRequest(http.MethodPost, url, nil)
-	if responseCode != http.StatusOK || err != nil {
+	responseData, _, err := c.sendRequest(http.MethodPost, url, nil)
+	if err != nil {
 		return err
 	}
 

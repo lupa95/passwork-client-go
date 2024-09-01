@@ -14,8 +14,8 @@ func (c *Client) GetFolder(folderId string) (FolderResponse, error) {
 	var responseObject FolderResponse
 	var err error
 
-	response, responseCode, err := c.sendRequest(method, url, nil)
-	if responseCode != http.StatusOK || err != nil {
+	response, _, err := c.sendRequest(method, url, nil)
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -25,7 +25,7 @@ func (c *Client) GetFolder(folderId string) (FolderResponse, error) {
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil
@@ -43,8 +43,8 @@ func (c *Client) SearchFolder(request FolderSearchRequest) (FolderSearchResponse
 	}
 
 	// HTTP request
-	response, responseCode, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if responseCode != http.StatusOK || err != nil {
+	response, _, err := c.sendRequest(method, url, bytes.NewReader(body))
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -55,7 +55,7 @@ func (c *Client) SearchFolder(request FolderSearchRequest) (FolderSearchResponse
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil
@@ -73,8 +73,8 @@ func (c *Client) AddFolder(folderRequest FolderRequest) (FolderResponse, error) 
 	}
 
 	// HTTP request
-	response, responseCode, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if responseCode != http.StatusCreated || err != nil {
+	response, _, err := c.sendRequest(method, url, bytes.NewReader(body))
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -85,7 +85,7 @@ func (c *Client) AddFolder(folderRequest FolderRequest) (FolderResponse, error) 
 	}
 
 	if responseObject.Status != "success" && responseObject.Code != "folderCreated" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil
@@ -102,8 +102,8 @@ func (c *Client) EditFolder(folderId string, request FolderRequest) (FolderRespo
 	}
 
 	// HTTP request
-	response, responseCode, err := c.sendRequest(method, url, bytes.NewReader(body))
-	if responseCode != http.StatusOK || err != nil {
+	response, _, err := c.sendRequest(method, url, bytes.NewReader(body))
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -114,7 +114,7 @@ func (c *Client) EditFolder(folderId string, request FolderRequest) (FolderRespo
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil
@@ -126,8 +126,8 @@ func (c *Client) DeleteFolder(folderId string) (DeleteResponse, error) {
 	var responseObject DeleteResponse
 
 	// HTTP request
-	response, responseCode, err := c.sendRequest(method, url, nil)
-	if responseCode != http.StatusOK || err != nil {
+	response, _, err := c.sendRequest(method, url, nil)
+	if err != nil {
 		return responseObject, err
 	}
 
@@ -138,7 +138,7 @@ func (c *Client) DeleteFolder(folderId string) (DeleteResponse, error) {
 	}
 
 	if responseObject.Status != "success" {
-		return responseObject, errors.New(responseObject.Status)
+		return responseObject, errors.New(responseObject.Code)
 	}
 
 	return responseObject, nil
