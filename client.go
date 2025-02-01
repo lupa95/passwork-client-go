@@ -114,7 +114,10 @@ func (c *Client) sendRequest(method string, url string, body io.Reader) ([]byte,
 	// Do HTTP Request
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, resp.StatusCode, err
+		if resp != nil {
+			return nil, resp.StatusCode, err
+		}
+		return nil, 0, err
 	}
 
 	// Convert Body into byte stream
