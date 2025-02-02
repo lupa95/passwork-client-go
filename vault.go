@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/lupa95/passwork-client-go/internal/utils"
 )
 
 func (c *Client) GetVault(vaultId string) (VaultResponse, error) {
@@ -19,7 +21,7 @@ func (c *Client) GetVault(vaultId string) (VaultResponse, error) {
 		return responseObject, err
 	}
 
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err = utils.ParseJSONResponse[VaultResponse](response)
 	if err != nil {
 		return responseObject, err
 	}
@@ -49,7 +51,7 @@ func (c *Client) AddVault(vaultRequest VaultAddRequest) (VaultOperationResponse,
 	}
 
 	// Parse JSON into struct
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err = utils.ParseJSONResponse[VaultOperationResponse](response)
 	if err != nil {
 		return responseObject, err
 	}
@@ -78,7 +80,7 @@ func (c *Client) EditVault(vaultId string, request VaultEditRequest) (VaultOpera
 	}
 
 	// Parse JSON into struct
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err = utils.ParseJSONResponse[VaultOperationResponse](response)
 	if err != nil {
 		return responseObject, err
 	}
@@ -102,7 +104,7 @@ func (c *Client) DeleteVault(vaultId string) (DeleteResponse, error) {
 	}
 
 	// Parse JSON into struct
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err = utils.ParseJSONResponse[DeleteResponse](response)
 	if err != nil {
 		return responseObject, err
 	}

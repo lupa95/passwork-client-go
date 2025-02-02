@@ -1,11 +1,13 @@
 package passwork
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"time"
+
+	"github.com/lupa95/passwork-client-go/internal/utils"
 )
 
 type Client struct {
@@ -28,7 +30,7 @@ type LogoutResponse struct {
 type LoginResponseData struct {
 	Token                 string
 	RefreshToken          string
-	ToeknTtl              int
+	TokenTtl              int
 	RefreshTokenTtl       int
 	TokenExpiredAt        int
 	RefreshTokenExpiredAt int
@@ -61,17 +63,16 @@ func (c *Client) Login() error {
 		return err
 	}
 
-	// Parse JSON into struct
-	var responseObject LoginResponse
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err := utils.ParseJSONResponse[LoginResponse](response)
 	if err != nil {
 		return err
 	}
 
-	if responseObject.Status == "success" {
-		c.sessionToken = responseObject.Data.Token
-		return nil
+	if responseObject.Status != "success" {
+		return fmt.Errorf("login failed, status: %s", responseObject.Status)
 	}
+
+	c.sessionToken = responseObject.Data.Token
 
 	return err
 }
@@ -79,14 +80,12 @@ func (c *Client) Login() error {
 func (c *Client) Logout() error {
 	url := fmt.Sprintf("%s/auth/logout", c.BaseURL)
 
-	responseData, _, err := c.sendRequest(http.MethodPost, url, nil)
+	response, _, err := c.sendRequest(http.MethodPost, url, nil)
 	if err != nil {
 		return err
 	}
 
-	// Parse JSON into struct
-	var responseObject LogoutResponse
-	err = json.Unmarshal(responseData, &responseObject)
+	responseObject, err := utils.ParseJSONResponse[LogoutResponse](response)
 	if err != nil {
 		return err
 	}
@@ -114,6 +113,7 @@ func (c *Client) sendRequest(method string, url string, body io.Reader) ([]byte,
 	// Do HTTP Request
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
+		log.Printf("HTTP Request failed: %v", err)
 		if resp != nil {
 			return nil, resp.StatusCode, err
 		}
