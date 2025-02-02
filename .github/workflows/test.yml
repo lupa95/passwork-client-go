@@ -9,11 +9,6 @@ on:
       - 'README.md'
       - '.gitignore'
       - 'LICENSE'
-  push:
-    paths-ignore:
-      - 'README.md'
-      - '.gitignore'
-      - 'LICENSE'
 
 # Testing only needs permissions to read the repository contents.
 permissions:
