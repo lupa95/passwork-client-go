@@ -1,11 +1,14 @@
 package passwork
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"time"
+
+	"github.com/lupa95/passwork-client-go/internal/utils"
 )
 
 type Client struct {
@@ -28,7 +31,7 @@ type LogoutResponse struct {
 type LoginResponseData struct {
 	Token                 string
 	RefreshToken          string
-	ToeknTtl              int
+	TokenTtl              int
 	RefreshTokenTtl       int
 	TokenExpiredAt        int
 	RefreshTokenExpiredAt int
@@ -49,6 +52,7 @@ func NewClient(baseURL, apiKey string, timeout time.Duration) *Client {
 			Timeout: timeout,
 		},
 	}
+
 	return &client
 }
 
@@ -61,32 +65,29 @@ func (c *Client) Login() error {
 		return err
 	}
 
-	// Parse JSON into struct
-	var responseObject LoginResponse
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err := utils.ParseJSONResponse[LoginResponse](response)
 	if err != nil {
 		return err
 	}
 
-	if responseObject.Status == "success" {
-		c.sessionToken = responseObject.Data.Token
-		return nil
+	if responseObject.Status != "success" {
+		return fmt.Errorf("login failed, status: %s", responseObject.Status)
 	}
 
-	return err
+	c.sessionToken = responseObject.Data.Token
+
+	return nil
 }
 
 func (c *Client) Logout() error {
 	url := fmt.Sprintf("%s/auth/logout", c.BaseURL)
 
-	responseData, _, err := c.sendRequest(http.MethodPost, url, nil)
+	response, _, err := c.sendRequest(http.MethodPost, url, nil)
 	if err != nil {
 		return err
 	}
 
-	// Parse JSON into struct
-	var responseObject LogoutResponse
-	err = json.Unmarshal(responseData, &responseObject)
+	responseObject, err := utils.ParseJSONResponse[LogoutResponse](response)
 	if err != nil {
 		return err
 	}
@@ -95,14 +96,16 @@ func (c *Client) Logout() error {
 		return nil
 	}
 
-	return err
+	return fmt.Errorf("logout failed, status: %s", responseObject.Status)
 }
 
 // Sends HTTP request to URL with method and body
-// Returns answer body
+// Returns response body
 func (c *Client) sendRequest(method string, url string, body io.Reader) ([]byte, int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 
-	req, err := http.NewRequest(method, url, body)
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -111,18 +114,22 @@ func (c *Client) sendRequest(method string, url string, body io.Reader) ([]byte,
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Passwork-Auth", c.sessionToken)
 
-	// Do HTTP Request
+	// Execute HTTP request
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, resp.StatusCode, err
+		log.Printf("HTTP Request failed: %v", err)
+		if resp != nil {
+			return nil, resp.StatusCode, err
+		}
+		return nil, 0, err
 	}
+	defer resp.Body.Close()
 
 	// Convert Body into byte stream
 	responseData, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return responseData, resp.StatusCode, err
+		return nil, resp.StatusCode, err
 	}
-	defer resp.Body.Close()
 
 	return responseData, resp.StatusCode, nil
 }

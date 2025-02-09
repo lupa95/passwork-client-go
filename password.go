@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/lupa95/passwork-client-go/internal/utils"
 )
 
 // Get a password by ID
@@ -22,7 +24,7 @@ func (c *Client) GetPassword(pwId string) (PasswordResponse, error) {
 	}
 
 	// Parse JSON into struct
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err = utils.ParseJSONResponse[PasswordResponse](response)
 	if err != nil {
 		return responseObject, err
 	}
@@ -52,8 +54,8 @@ func (c *Client) SearchPassword(request PasswordSearchRequest) (PasswordSearchRe
 		return responseObject, err
 	}
 
-	// Parse JSON into struct (this returns a list of results)
-	err = json.Unmarshal(response, &responseObject)
+	// Parse JSON into struct
+	responseObject, err = utils.ParseJSONResponse[PasswordSearchResponse](response)
 	if err != nil {
 		return responseObject, err
 	}
@@ -83,7 +85,7 @@ func (c *Client) AddPassword(pwRequest PasswordRequest) (PasswordResponse, error
 	}
 
 	// Parse JSON into struct
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err = utils.ParseJSONResponse[PasswordResponse](response)
 	if err != nil {
 		return responseObject, err
 	}
@@ -112,7 +114,7 @@ func (c *Client) EditPassword(pwId string, request PasswordRequest) (PasswordRes
 	}
 
 	// Parse JSON into struct
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err = utils.ParseJSONResponse[PasswordResponse](response)
 	if err != nil {
 		return responseObject, err
 	}
@@ -136,7 +138,7 @@ func (c *Client) DeletePassword(pwId string) (DeleteResponse, error) {
 	}
 
 	// Parse JSON into struct
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err = utils.ParseJSONResponse[DeleteResponse](response)
 	if err != nil {
 		return responseObject, err
 	}

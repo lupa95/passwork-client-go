@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/lupa95/passwork-client-go/internal/utils"
 )
 
 func (c *Client) GetFolder(folderId string) (FolderResponse, error) {
@@ -19,7 +21,7 @@ func (c *Client) GetFolder(folderId string) (FolderResponse, error) {
 		return responseObject, err
 	}
 
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err = utils.ParseJSONResponse[FolderResponse](response)
 	if err != nil {
 		return responseObject, err
 	}
@@ -49,7 +51,7 @@ func (c *Client) SearchFolder(request FolderSearchRequest) (FolderSearchResponse
 	}
 
 	// Parse JSON into struct (this returns a list of results)
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err = utils.ParseJSONResponse[FolderSearchResponse](response)
 	if err != nil {
 		return responseObject, err
 	}
@@ -79,7 +81,7 @@ func (c *Client) AddFolder(folderRequest FolderRequest) (FolderResponse, error) 
 	}
 
 	// Parse JSON into struct
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err = utils.ParseJSONResponse[FolderResponse](response)
 	if err != nil {
 		return responseObject, err
 	}
@@ -108,7 +110,7 @@ func (c *Client) EditFolder(folderId string, request FolderRequest) (FolderRespo
 	}
 
 	// Parse JSON into struct
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err = utils.ParseJSONResponse[FolderResponse](response)
 	if err != nil {
 		return responseObject, err
 	}
@@ -132,7 +134,7 @@ func (c *Client) DeleteFolder(folderId string) (DeleteResponse, error) {
 	}
 
 	// Parse JSON into struct
-	err = json.Unmarshal(response, &responseObject)
+	responseObject, err = utils.ParseJSONResponse[DeleteResponse](response)
 	if err != nil {
 		return responseObject, err
 	}
