@@ -16,7 +16,6 @@ type Client struct {
 	apiKey       string
 	sessionToken string
 	HTTPClient   *http.Client
-	Context      context.Context
 }
 
 type LoginResponse struct {
@@ -45,9 +44,6 @@ type User struct {
 }
 
 func NewClient(baseURL, apiKey string, timeout time.Duration) *Client {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
 	client := Client{
 		BaseURL:      baseURL,
 		apiKey:       apiKey,
@@ -55,8 +51,8 @@ func NewClient(baseURL, apiKey string, timeout time.Duration) *Client {
 		HTTPClient: &http.Client{
 			Timeout: timeout,
 		},
-		Context: ctx,
 	}
+
 	return &client
 }
 
@@ -104,11 +100,12 @@ func (c *Client) Logout() error {
 }
 
 // Sends HTTP request to URL with method and body
-// Returns answer body
+// Returns response body
 func (c *Client) sendRequest(method string, url string, body io.Reader) ([]byte, int, error) {
-	// Use the client's default context if none is provided
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 
-	req, err := http.NewRequestWithContext(c.Context, method, url, body)
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return nil, 0, err
 	}
