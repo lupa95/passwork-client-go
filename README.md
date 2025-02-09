@@ -51,6 +51,10 @@ func main() {
 ## Running tests
 
 ```go
+export PASSWORK_API_KEY="api-key"
+export PASSWORK_HOST="https://my-passwork-instance/api/v4"
+export PASSWORK_VAULT_ID="vault-id"
+
 go test
 
 // More elaborate
